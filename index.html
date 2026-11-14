@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Which Hunger Games Character Are You? | Interactive Personality Quiz</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans for punchy BuzzFeed-style headlines -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti for celebratory result reveal -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              red: '#EE3322',
+              gold: '#F59E0B',
+              ember: '#EA580C',
+              dark: '#12131A'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F7F7F9;
+      color: #18181B;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .option-card {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .option-card:hover {
+      transform: translateY(-2px);
+    }
+    .option-card:active {
+      transform: scale(0.98);
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.94) translateY(12px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop-in {
+      animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-300 selection:text-black">
+
+  <!-- Sticky Top Navigation / Progress Bar -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-red text-white font-display font-black text-lg tracking-tighter shadow-sm">
+          Q!
+        </span>
+        <span class="font-display font-extrabold text-lg tracking-tight text-gray-900">
+          Vibe<span class="text-brand-red">Check</span>
+        </span>
+      </div>
+
+      <!-- Franchise Badge Pill -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 py-1.5 px-3.5 rounded-full border border-amber-300/80 flex items-center gap-1.5">
+          <span>🔥</span>
+          <span>The Hunger Games</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Dynamic Progress Bar -->
+    <div id="progress-container" class="w-full h-1.5 bg-gray-100 hidden">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-red via-orange-500 to-amber-400 transition-all duration-300 ease-out" style="width: 0%"></div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-grow max-w-3xl w-full mx-auto px-4 py-6 sm:py-10">
+
+    <!-- INTRO / HERO CARD -->
+    <section id="intro-section" class="bg-white rounded-3xl shadow-md border border-gray-200/80 overflow-hidden animate-pop-in">
+      <div class="p-6 sm:p-8">
+        <!-- BuzzFeed-style Category Badges -->
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-yellow-300 text-gray-900">
+            Personality Quiz
+          </span>
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-100 text-orange-700">
+            Panem Edition
+          </span>
+          <span class="text-xs font-medium text-gray-500 ml-auto">⏱️ 1 min • 7 Questions</span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-black text-gray-900 leading-tight mb-3">
+          Make 7 Choices & We'll Reveal Which <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-amber-500">Hunger Games</span> Icon You Truly Are
+        </h1>
+        <p class="text-gray-600 text-base sm:text-lg leading-relaxed mb-6">
+          From Capitol gala strategy to survival instincts in the arena—be honest about how you handle pressure, loyalty, and chaos. May the odds be ever in your favor!
+        </p>
+
+        <!-- Hero Visual Banner -->
+        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-950 via-red-950 to-amber-900 p-6 sm:p-8 text-white mb-6 shadow-inner">
+          <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-center sm:text-left">
+              <p class="text-xs uppercase tracking-widest text-amber-300 font-bold mb-1">Official Panem Vibe Check</p>
+              <p class="text-lg sm:text-xl font-bold text-white/95">4 Iconic Tributes & Victors • Full Match Breakdown</p>
+            </div>
+            <div class="flex -space-x-2 text-3xl sm:text-4xl select-none">
+              <span class="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20" title="Katniss">🏹</span>
+              <span class="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20" title="Peeta">🥖</span>
+              <span class="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20" title="Finnick">🔱</span>
+              <span class="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20" title="Haymitch">🥂</span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="startQuiz()"
+          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-display font-extrabold text-lg sm:text-xl shadow-lg shadow-red-500/25 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer">
+          <span>Enter the Arena</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- QUIZ QUESTIONS CONTAINER -->
+    <section id="quiz-section" class="hidden space-y-5">
+      <!-- Question Header Status -->
+      <div class="flex items-center justify-between px-1">
+        <span id="question-counter" class="text-sm font-extrabold uppercase tracking-wider text-brand-red">
+          Question 1 of 7
+        </span>
+        <button id="prev-btn" onclick="prevQuestion()" class="hidden text-sm font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1 cursor-pointer transition">
+          ← Previous
+        </button>
+      </div>
+
+      <!-- Active Question Card -->
+      <div id="question-card" class="bg-white rounded-3xl shadow-md border border-gray-200/80 overflow-hidden animate-pop-in">
+        <!-- Colorful Question Banner Header -->
+        <div id="question-banner" class="p-6 sm:p-8 bg-gradient-to-r from-red-600 to-amber-600 text-white">
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <span class="inline-block px-2.5 py-0.5 rounded-md bg-white/20 text-xs font-bold uppercase tracking-wider">
+              Choose one
+            </span>
+            <span id="question-emoji" class="text-3xl">🏹</span>
+          </div>
+          <h2 id="question-text" class="text-xl sm:text-2xl font-extrabold leading-snug">
+            Question text goes here?
+          </h2>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <!-- Options injected dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS SECTION -->
+    <section id="result-section" class="hidden space-y-6 animate-pop-in">
+      <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+        <!-- Top Result Header Banner -->
+        <div id="result-header" class="p-6 sm:p-10 text-white bg-gradient-to-br from-red-600 via-orange-600 to-amber-500 relative overflow-hidden">
+          <div class="relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 backdrop-blur-sm text-xs font-extrabold uppercase tracking-wider mb-3">
+              <span>🔥 Your Official Match</span>
+              <span>•</span>
+              <span id="result-match-pct">96% Vibe Match</span>
+            </div>
+            <p class="text-white/90 font-semibold text-sm sm:text-base mb-1">You got:</p>
+            <h2 id="result-name" class="text-3xl sm:text-5xl font-black tracking-tight mb-2">
+              Katniss Everdeen
+            </h2>
+            <p id="result-tagline" class="text-lg sm:text-xl font-bold text-yellow-200">
+              "The Girl on Fire • Fierce Protector"
+            </p>
+          </div>
+          <!-- Decorative Big Emoji -->
+          <div id="result-big-emoji" class="absolute -bottom-4 -right-2 text-8xl sm:text-9xl opacity-25 select-none pointer-events-none">
+            🏹
+          </div>
+        </div>
+
+        <!-- Result Body -->
+        <div class="p-6 sm:p-8 space-y-6">
+          <!-- Iconic Quote Box -->
+          <blockquote id="result-quote" class="border-l-4 border-amber-500 pl-4 py-1 italic text-gray-600 font-medium text-base sm:text-lg bg-amber-50/50 rounded-r-xl">
+            "May the odds be ever in your favor."
+          </blockquote>
+
+          <!-- Character Description -->
+          <div>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-2">Why You're Total Twins</h3>
+            <p id="result-description" class="text-gray-700 text-base sm:text-lg leading-relaxed">
+              Detailed personality breakdown goes here.
+            </p>
+          </div>
+
+          <!-- Aesthetic & Trait Pills -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200/70">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block mb-2.5">Your Core Superpowers</span>
+              <div id="result-traits" class="flex flex-wrap gap-2">
+                <!-- Trait badges -->
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200/70">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block mb-2">Signature Aesthetic</span>
+              <p id="result-aesthetic" class="text-sm font-semibold text-gray-800 leading-relaxed">
+                Leather jackets, pine forests, mockingjay pins, and quiet intensity.
+              </p>
+            </div>
+          </div>
+
+          <!-- Compatibility & Character Match Breakdown -->
+          <div class="bg-orange-50/70 rounded-2xl p-4 sm:p-5 border border-orange-200/70">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-orange-950">Your Panem Soul Breakdown</span>
+              <span id="result-bestie" class="text-xs font-bold text-orange-800 bg-orange-200/70 px-3 py-1 rounded-full self-start sm:self-auto">
+                Arena Ally: Peeta Mellark
+              </span>
+            </div>
+            <div id="breakdown-bars" class="space-y-3">
+              <!-- Score bars injected via JS -->
+            </div>
+          </div>
+
+          <!-- Action Buttons: Share & Retake -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-2">
+            <button onclick="copyResultToClipboard()"
+              class="flex-1 py-3.5 px-5 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-base shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <span>Copy & Share Result</span>
+            </button>
+
+            <button onclick="resetQuiz()"
+              class="py-3.5 px-6 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-base transition flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Retake Quiz</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Custom Toast Notification -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-full shadow-2xl text-sm font-semibold flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-4">
+    <span id="toast-icon">🔥</span>
+    <span id="toast-message">Result copied to clipboard!</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="max-w-3xl w-full mx-auto px-4 py-6 text-center text-xs text-gray-400">
+    May the odds be ever in your favor • Built for Hunger Games fans ✨
+  </footer>
+
+  <script>
+    /**
+     * The Hunger Games Quiz Data
+     * Features 4 iconic characters and 7 engaging, teen/YA-relatable questions
+     * with weighted point distribution for balanced, nuanced results.
+     */
+    const QUIZ_DATA = {
+      characters: {
+        katniss: {
+          name: "Katniss Everdeen",
+          tagline: "The Girl on Fire • Fierce & Unstoppable Protector",
+          emoji: "🏹",
+          quote: "“I volunteer as tribute!”",
+          gradient: "from-red-600 via-orange-600 to-amber-500",
+          barColor: "bg-red-500",
+          description: "You don't ask for the spotlight, yet somehow you always end up leading the revolution. Practical, fiercely protective of the people you love, and allergic to fake small talk, you rely on instinct and grit when things get tough. Once someone earns your trust, you will move mountains to keep them safe.",
+          traits: ["Fiercely Loyal", "Resourceful", "Zero Fake Energy", "Natural Survivor"],
+          aesthetic: "Braided hair, dark leather jackets, misty pine woods, glowing embers, and quiet intensity.",
+          bestie: "Peeta Mellark"
+        },
+        peeta: {
+          name: "Peeta Mellark",
+          tagline: "The Boy with the Bread • Heart of Gold & Master Communicator",
+          emoji: "🥖",
+          quote: "“I just don't want them to change me. Turn me into some kind of monster that I'm not.”",
+          gradient: "from-amber-500 via-yellow-500 to-orange-500",
+          barColor: "bg-amber-500",
+          description: "Never mistake your kindness for weakness—your emotional intelligence is your greatest superpower. You know how to read a room, win people over with genuine warmth, and stay true to your morals even when the whole world is trying to break you.",
+          traits: ["High EQ", "Charismatic", "Unshakable Morals", "Artistic Soul"],
+          aesthetic: "Warm bakery mornings, painted canvases, golden sunlight, handwritten notes, and effortless charm.",
+          bestie: "Katniss Everdeen"
+        },
+        finnick: {
+          name: "Finnick Odair",
+          tagline: "District 4 Icon • Effortless Charm & Secret Depth",
+          emoji: "🔱",
+          quote: "“It takes ten times as long to put yourself back together as it does to fall apart.”",
+          gradient: "from-cyan-600 via-teal-600 to-emerald-500",
+          barColor: "bg-teal-500",
+          description: "On the outside, you're witty, confident, and effortlessly magnetic—everyone wants to be in your orbit. Underneath the humor and charisma, though, you're deeply observant, fiercely devoted to your inner circle, and way sharper than people give you credit for.",
+          traits: ["Magnetic", "Quick-Witted", "Secretly Strategic", "Ride-or-Die"],
+          aesthetic: "Ocean waves, sugar cubes, knotted ropes, effortless swagger, and golden-hour beach vibes.",
+          bestie: "Katniss Everdeen"
+        },
+        haymitch: {
+          name: "Haymitch Abernathy",
+          tagline: "The Mastermind Mentor • Sarcastic Genius",
+          emoji: "🥂",
+          quote: "“Stay alive. That’s the best advice I can give you.”",
+          gradient: "from-slate-800 via-purple-900 to-indigo-800",
+          barColor: "bg-indigo-600",
+          description: "You've seen it all, you're tired of everyone's nonsense, and your dry sarcasm is legendary. Even when you act like you don't care, you're always three steps ahead—pulling strings behind the scenes to make sure your people come out on top.",
+          traits: ["3 Steps Ahead", "Elite Sarcasm", "Street-Smart", "Secret Softie"],
+          aesthetic: "Late-night strategy sessions, dark humor, vintage coats, and knowing every secret in the room.",
+          bestie: "Effie Trinket"
+        }
+      },
+      questions: [
+        {
+          text: "You're dropped into a high-stakes group project with a chaotic team. What's your immediate move?",
+          emoji: "📋",
+          banner: "from-red-600 to-orange-600",
+          options: [
+            { text: "Quietly take over the hardest part myself so I know it gets done right", emoji: "🏹", scores: { katniss: 3, haymitch: 1 } },
+            { text: "Hype everyone up, smooth over tension, and nail the presentation pitch", emoji: "🎤", scores: { peeta: 3, finnick: 1 } },
+            { text: "Charm the teacher into giving us an extension while cracking jokes", emoji: "😉", scores: { finnick: 3, haymitch: 1 } },
+            { text: "Sit back with an iced coffee, spot the loopholes, and delegate the rest", emoji: "🕶️", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        },
+        {
+          text: "It's the Capitol Tribute Parade! What kind of outfit are you wearing to make an entrance?",
+          emoji: "✨",
+          banner: "from-amber-500 to-rose-600",
+          options: [
+            { text: "Something dramatic and bold that literally turns heads and breaks rules", emoji: "🔥", scores: { katniss: 3, finnick: 1 } },
+            { text: "Classic, tailored, and warm—effortlessly stylish without trying too hard", emoji: "🧥", scores: { peeta: 3, haymitch: 1 } },
+            { text: "Iconic, eye-catching, and confident—I own every camera in the room", emoji: "🔱", scores: { finnick: 3, peeta: 1 } },
+            { text: "All black with zero patience for itchy fabrics or fake smiles", emoji: "🖤", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        },
+        {
+          text: "A silver parachute drops from the sky in the arena! What's inside that makes you happiest?",
+          emoji: "🪂",
+          banner: "from-teal-600 to-cyan-600",
+          options: [
+            { text: "A high-tech multi-tool and reliable gear to survive anything", emoji: "🧭", scores: { katniss: 3, haymitch: 1 } },
+            { text: "Warm fresh-baked bread and soup to share with my ally", emoji: "🥖", scores: { peeta: 3, finnick: 1 } },
+            { text: "A handful of sugar cubes and a clever coded note from outside", emoji: "🧊", scores: { finnick: 3, haymitch: 1 } },
+            { text: "Medicine, a compass, and exact instructions on where the traps are", emoji: "🗺️", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        },
+        {
+          text: "How do you handle someone who is clearly lying straight to your face?",
+          emoji: "🤨",
+          banner: "from-indigo-600 to-purple-700",
+          options: [
+            { text: "Give them a deadpan stare and walk away—I have zero time for fake people", emoji: "😒", scores: { katniss: 3, haymitch: 1 } },
+            { text: "Stay calm, listen closely, and gently steer the conversation to the truth", emoji: "🕊️", scores: { peeta: 3, finnick: 1 } },
+            { text: "Play along with a smirk while filing away their secret for later", emoji: "😏", scores: { finnick: 3, haymitch: 1 } },
+            { text: "Call them out with one brutally accurate, sarcastic one-liner", emoji: "🎯", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        },
+        {
+          text: "Pick your ideal way to spend a rare, stress-free afternoon in Panem:",
+          emoji: "🌲",
+          banner: "from-emerald-600 to-teal-700",
+          options: [
+            { text: "Exploring quiet forest trails solo with my favorite playlist", emoji: "🌲", scores: { katniss: 3, haymitch: 1 } },
+            { text: "Baking, painting, or making something thoughtful for a friend", emoji: "🎨", scores: { peeta: 3, katniss: 1 } },
+            { text: "Hanging by the ocean with my favorite people laughing for hours", emoji: "🌊", scores: { finnick: 3, peeta: 1 } },
+            { text: "Sleeping in, avoiding everyone, and enjoying total peace and quiet", emoji: "😴", scores: { haymitch: 3, finnick: 1 } }
+          ]
+        },
+        {
+          text: "Your closest friend is in trouble and needs backup immediately. What's your instinct?",
+          emoji: "⚡",
+          banner: "from-rose-600 to-red-700",
+          options: [
+            { text: "Step straight into the line of fire for them without a second thought", emoji: "🛡️", scores: { katniss: 3, peeta: 1 } },
+            { text: "Stay by their side, keep them grounded, and help them find hope", emoji: "💛", scores: { peeta: 3, finnick: 1 } },
+            { text: "Use every connection and trick I know to pull them out of danger", emoji: "🪢", scores: { finnick: 3, haymitch: 1 } },
+            { text: "Mastermind a rescue plan from the shadows so we both survive", emoji: "♟️", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        },
+        {
+          text: "Which quote hits closest to your actual life philosophy?",
+          emoji: "🔥",
+          banner: "from-orange-500 to-amber-600",
+          options: [
+            { text: "“Actions speak way louder than speeches ever will.”", emoji: "🏹", scores: { katniss: 3, haymitch: 1 } },
+            { text: "“Kindness isn't weakness—it's how you stay human.”", emoji: "🌻", scores: { peeta: 3, finnick: 1 } },
+            { text: "“Never let them see you sweat; always keep an ace up your sleeve.”", emoji: "🃏", scores: { finnick: 3, haymitch: 1 } },
+            { text: "“Expect the worst, plan for everything, and stay alive.”", emoji: "🥃", scores: { haymitch: 3, katniss: 1 } }
+          ]
+        }
+      ]
+    };
+
+    // Quiz State
+    let currentQuestionIndex = 0;
+    let userAnswers = []; // Stores selected option index per question
+
+    // DOM Elements
+    const introSection = document.getElementById('intro-section');
+    const quizSection = document.getElementById('quiz-section');
+    const resultSection = document.getElementById('result-section');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const questionCounter = document.getElementById('question-counter');
+    const prevBtn = document.getElementById('prev-btn');
+    const questionCard = document.getElementById('question-card');
+    const questionBanner = document.getElementById('question-banner');
+    const questionEmoji = document.getElementById('question-emoji');
+    const questionText = document.getElementById('question-text');
+    const optionsGrid = document.getElementById('options-grid');
+
+    /**
+     * Starts the quiz from the intro screen
+     */
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      userAnswers = [];
+      introSection.classList.add('hidden');
+      resultSection.classList.add('hidden');
+      quizSection.classList.remove('hidden');
+      progressContainer.classList.remove('hidden');
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /**
+     * Renders the current question and its 4 interactive option cards
+     */
+    function renderQuestion() {
+      const totalQuestions = QUIZ_DATA.questions.length;
+      const q = QUIZ_DATA.questions[currentQuestionIndex];
+
+      // Update counter and progress bar
+      questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+      const progressPct = ((currentQuestionIndex) / totalQuestions) * 100;
+      progressBar.style.width = `${progressPct}%`;
+
+      // Show/hide Previous button
+      if (currentQuestionIndex > 0) {
+        prevBtn.classList.remove('hidden');
+      } else {
+        prevBtn.classList.add('hidden');
+      }
+
+      // Re-trigger subtle entrance animation
+      questionCard.classList.remove('animate-pop-in');
+      void questionCard.offsetWidth; // trigger reflow
+      questionCard.classList.add('animate-pop-in');
+
+      // Update banner styling & text
+      questionBanner.className = `p-6 sm:p-8 bg-gradient-to-r ${q.banner} text-white`;
+      questionEmoji.textContent = q.emoji;
+      questionText.textContent = q.text;
+
+      // Render option cards
+      optionsGrid.innerHTML = '';
+      const previouslySelected = userAnswers[currentQuestionIndex];
+
+      q.options.forEach((opt, idx) => {
+        const isSelected = previouslySelected === idx;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `option-card text-left p-4 sm:p-5 rounded-2xl border-2 flex items-start gap-3.5 cursor-pointer focus:outline-none ${
+          isSelected
+            ? 'border-brand-red bg-red-50/70 shadow-md'
+            : 'border-gray-200 bg-white hover:border-amber-400 hover:bg-amber-50/30 shadow-sm'
+        }`;
+
+        btn.innerHTML = `
+          <span class="text-2xl sm:text-3xl flex-shrink-0 select-none mt-0.5">${opt.emoji}</span>
+          <span class="font-semibold text-gray-800 text-sm sm:text-base leading-snug">${opt.text}</span>
+        `;
+
+        btn.addEventListener('click', () => handleOptionSelect(idx));
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    /**
+     * Handles selecting an answer and smoothly advancing
+     */
+    function handleOptionSelect(optionIdx) {
+      userAnswers[currentQuestionIndex] = optionIdx;
+
+      // Visually highlight clicked card immediately
+      const cards = optionsGrid.querySelectorAll('button');
+      cards.forEach((card, i) => {
+        if (i === optionIdx) {
+          card.className = 'option-card text-left p-4 sm:p-5 rounded-2xl border-2 border-brand-red bg-red-50 shadow-md flex items-start gap-3.5 cursor-pointer scale-[0.99]';
+        } else {
+          card.className = 'option-card text-left p-4 sm:p-5 rounded-2xl border-2 border-gray-200 bg-white opacity-60 flex items-start gap-3.5 cursor-pointer';
+        }
+      });
+
+      // Short delay so user sees their selection before transitioning
+      setTimeout(() => {
+        if (currentQuestionIndex < QUIZ_DATA.questions.length - 1) {
+          currentQuestionIndex++;
+          renderQuestion();
+        } else {
+          progressBar.style.width = '100%';
+          showResults();
+        }
+      }, 240);
+    }
+
+    /**
+     * Navigates back to the previous question
+     */
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    /**
+     * Calculates weighted scores across all characters and displays the result reveal
+     */
+    function showResults() {
+      const scores = {
+        katniss: 0,
+        peeta: 0,
+        finnick: 0,
+        haymitch: 0
+      };
+
+      // Tally points from all answers
+      userAnswers.forEach((selectedOptIdx, qIdx) => {
+        const option = QUIZ_DATA.questions[qIdx].options[selectedOptIdx];
+        if (option && option.scores) {
+          for (const [charKey, pts] of Object.entries(option.scores)) {
+            scores[charKey] = (scores[charKey] || 0) + pts;
+          }
+        }
+      });
+
+      // Sort characters by highest score
+      const sortedEntries = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const winnerKey = sortedEntries[0][0];
+      const winnerScore = sortedEntries[0][1];
+      const winner = QUIZ_DATA.characters[winnerKey];
+
+      // Calculate total points awarded for percentage breakdown
+      const totalPoints = Object.values(scores).reduce((sum, val) => sum + val, 0) || 1;
+      // Compute an engaging match percentage (scaled nicely between 78% and 99%)
+      const maxPossibleForWinner = QUIZ_DATA.questions.length * 3;
+      const rawRatio = winnerScore / maxPossibleForWinner;
+      const displayMatchPct = Math.min(99, Math.max(76, Math.round(68 + rawRatio * 31)));
+
+      // Populate Result UI
+      document.getElementById('result-header').className = `p-6 sm:p-10 text-white bg-gradient-to-br ${winner.gradient} relative overflow-hidden`;
+      document.getElementById('result-match-pct').textContent = `${displayMatchPct}% Vibe Match`;
+      document.getElementById('result-name').textContent = winner.name;
+      document.getElementById('result-tagline').textContent = winner.tagline;
+      document.getElementById('result-big-emoji').textContent = winner.emoji;
+      document.getElementById('result-quote').textContent = winner.quote;
+      document.getElementById('result-description').textContent = winner.description;
+      document.getElementById('result-aesthetic').textContent = winner.aesthetic;
+      document.getElementById('result-bestie').textContent = `Arena Ally: ${winner.bestie}`;
+
+      // Render Trait Pills
+      const traitsContainer = document.getElementById('result-traits');
+      traitsContainer.innerHTML = '';
+      winner.traits.forEach(trait => {
+        const badge = document.createElement('span');
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-800 shadow-xs';
+        badge.textContent = `✦ ${trait}`;
+        traitsContainer.appendChild(badge);
+      });
+
+      // Render Character Breakdown Bars
+      const breakdownContainer = document.getElementById('breakdown-bars');
+      breakdownContainer.innerHTML = '';
+      sortedEntries.forEach(([charKey, score]) => {
+        const charInfo = QUIZ_DATA.characters[charKey];
+        const pct = Math.round((score / totalPoints) * 100);
+
+        const row = document.createElement('div');
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-bold text-gray-800 mb-1">
+            <span class="flex items-center gap-1.5">
+              <span>${charInfo.emoji}</span>
+              <span>${charInfo.name}</span>
+            </span>
+            <span>${pct}%</span>
+          </div>
+          <div class="w-full h-2.5 bg-orange-200/50 rounded-full overflow-hidden">
+            <div class="h-full ${charInfo.barColor} rounded-full transition-all duration-700" style="width: ${pct}%"></div>
+          </div>
+        `;
+        breakdownContainer.appendChild(row);
+      });
+
+      // Transition Views
+      quizSection.classList.add('hidden');
+      progressContainer.classList.add('hidden');
+      resultSection.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Trigger celebratory confetti burst
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 85,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#EE3322', '#F59E0B', '#FDE047', '#EA580C']
+        });
+      }
+    }
+
+    /**
+     * Copies a shareable summary of the user's result to clipboard using execCommand fallback
+     */
+    function copyResultToClipboard() {
+      const charName = document.getElementById('result-name').textContent;
+      const tagline = document.getElementById('result-tagline').textContent;
+      const matchPct = document.getElementById('result-match-pct').textContent;
+      const shareText = `🔥 I took The Hunger Games Personality Quiz and got ${charName} (${matchPct}) — ${tagline}! May the odds be ever in your favor 🏹`;
+
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        showToast('🔥', 'Copied! Ready to paste in your group chat.');
+      } catch (err) {
+        showToast('✨', `You got ${charName}!`);
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+
+    /**
+     * Displays a smooth non-blocking toast message
+     */
+    function showToast(icon, message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-icon').textContent = icon;
+      document.getElementById('toast-message').textContent = message;
+
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 3000);
+    }
+
+    /**
+     * Resets the quiz back to the start screen
+     */
+    function resetQuiz() {
+      currentQuestionIndex = 0;
+      userAnswers = [];
+      resultSection.classList.add('hidden');
+      quizSection.classList.add('hidden');
+      progressContainer.classList.add('hidden');
+      introSection.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
